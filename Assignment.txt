@@ -1,0 +1,52 @@
+class UnionFind {
+public:
+    vector<int> parent;
+    vector<int> size;
+
+    UnionFind(int n) {
+        parent.resize(n);
+        size.resize(n, 1);
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int find(int x) {
+        if (x == parent[x]) {
+            return x;
+        }
+        return parent[x] = find(parent[x]);
+    }
+
+    void unite(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
+        if (rootX == rootY) {
+            return;
+        }
+        if (size[rootX] < size[rootY]) {
+            swap(rootX, rootY);
+        }
+        parent[rootY] = rootX;
+        size[rootX] += size[rootY];
+    }
+
+    bool connected(int x, int y) {
+        return find(x) == find(y);
+    }
+};
+
+int makeConnected(int n, vector<vector<int>>& connections) {
+    if (connections.size() < n - 1) {
+        return -1;
+    }
+    UnionFind uf(n);
+    int numGroups = n;
+    for (auto& conn : connections) {
+        if (!uf.connected(conn[0], conn[1])) {
+            uf.unite(conn[0], conn[1]);
+            numGroups--;
+        }
+    }
+    return numGroups - 1;
+}
